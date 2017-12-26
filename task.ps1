@@ -9,7 +9,7 @@ $projects = Get-SolutionProjects
 task Clean {
 	if (Test-Path $absoluteOutputDir)
 	{
-		Write-Host "Cleaning output directory..."
+		Write-Host "Cleaning directory $absoluteOutputDir..."
 		Remove-Item "$absoluteOutputDir" -Recurse -Force -ErrorAction SilentlyContinue | Out-Null
 	}
 
@@ -53,5 +53,27 @@ task Compile {
 		}
 }
 
-task Dev Clean, Compile
+task Test {
+	$projects |
+		ForEach-Object {
+			$testToolPath = Get-PackagePath "xunit.runner.console" $($_.Directory)
+			if ($testToolPath -eq $null) {
+				Write-Host "Test tool doesn't exist"
+				return
+			}
 
+			Write-Host "Running test tool on $($_.Name)..."
+			$testTool = "$testToolPath\tools\net452\xunit.console.exe"
+
+			Write-Host $testTool
+			if ($testTool -ne $null) {			
+				exec { & $testTool $absoluteOutputDir\$($_.Name)\bin\$($_.Name).dll `
+						-xml "$absoluteOutputDir\xunit_$($_.Name).xml" `
+						-html "$absoluteOutputDir\xunit_$($_.Name).html" `
+						-nologo }
+			}
+		}
+}
+
+task Dev Clean, Compile #, Test
+task CI Dev

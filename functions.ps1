@@ -17,3 +17,20 @@ function Get-SolutionProjects {
 				}
 			}
 }
+
+function Get-PackagePath($packageId, $projectPath) {
+	if (!(Test-Path "$projectPath\packages.config")) {
+		throw "Package.config doesn't exist in $projectPath"
+	}
+	else {
+		[xml]$packageXml = Get-Content "$projectPath\packages.config"
+		$package = $packageXml.Packages.Package | Where {$_.id -eq $packageId}
+		if (!$package) {
+			return $null
+		}
+	}
+	
+	Write-Host "$($package.id) - $($package.version)"
+
+	return "packages\$($package.id).$($package.version)"
+}
