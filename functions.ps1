@@ -34,3 +34,28 @@ function Get-PackagePath($packageId, $projectPath) {
 
 	return "packages\$($package.id).$($package.version)"
 }
+
+function Get-Version($projectPath) {
+	$line = Get-Content "$projectPath\properties\AssemblyInfo.cs" | Where { $_.Contains("AssemblyVersion") }
+	if (!$line) {
+		throw "AssbmelyInfo not available."
+	}
+
+	$version=$line.Split('"')[1]
+
+	$isLocalBuild = [String]::IsNullOrEmpty($env:BUILD_SERVER)
+
+	if ($isLocalBuild) {		
+		$buildDate = $(Get-Date).ToString("MMddyyyy")
+		$buildTime = $(Get-Date).ToString("HHmmss")
+		#$version="$($version.Replace("*",0))_$($buildDate)_$($buildTime)"
+		$preRelease = $(Get-Date).ToString("MMddyyyy")
+		$version="$($version.Replace("*",0))-pre$preRelease"
+	}
+	else {
+		$version = $version.Replace("*", $env:BUILD_NUMBER)
+	}
+
+	return $version
+
+}

@@ -7,14 +7,21 @@ if (!(Get-Command NuGet -ErrorAction SilentlyContinue) -and !(Test-Path $nugetPa
 	$downloadUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
 	(New-Object System.Net.WebClient).DownloadFile($downloadUrl, $nugetPath)
 }
+else
+{
+	Write-Host "NuGet package already exists. Skipping download."
+}
 
 if (Test-Path $nugetPath)
 {
 	Set-Alias NuGet (Resolve-Path $nugetPath)
+	Write-Host "Restoring Nuget..."
+	NuGet restore
 }
-
-Write-Host "Restoring Nuget..."
-NuGet restore
+else
+{
+	Write-Host "NuGet package could not be found."
+}
 
 . '.\functions.ps1'
 
