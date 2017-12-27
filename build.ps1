@@ -1,6 +1,12 @@
 cls
 
 $nugetPath = "$env:LOCALAPPDATA\NuGet\NuGet.exe"
+$policy = Get-ExecutionPolicy
+Write-Host "Current execution policy: " $policy
+Set-ExecutionPolicy RemoteSigned
+$policy = Get-ExecutionPolicy
+Write-Host "New execution policy: " $policy
+
 if (!(Get-Command NuGet -ErrorAction SilentlyContinue) -and !(Test-Path $nugetPath))
 {
 	Write-Host "Downloading NuGet.exe..."
@@ -15,6 +21,7 @@ if (!(Get-Command NuGet -ErrorAction SilentlyContinue) -and !(Test-Path $nugetPa
 	$web.Headers[[System.Net.HttpRequestHeader]::Authorization] = "Basic" + $credentialsB64S
 	#>
 	if ($web -ne $null)	{
+		Write-Host "Web client is valid. Trying to download..."
 		$web.DownloadFile($downloadUrl, $nugetPath)
 	}
 	else {
