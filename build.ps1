@@ -12,7 +12,7 @@ if (!(Get-Command NuGet -ErrorAction SilentlyContinue) -and !(Test-Path $nugetPa
 	$web = New-Object System.Net.WebClient
 	$credentials = [System.Text.Encoding]::ASCII.GetBytes("admin:P@ssw0rd123")
 	$credentialsB64S = [System.Convert]::ToBase64String($credentials)
-	$web.Headers[[Sytstem.Net.HttpRequestHeader]::Authorization] = "Basic" + $credentialsB64S
+	$web.Headers[[System.Net.HttpRequestHeader]::Authorization] = "Basic" + $credentialsB64S
 
 	$web.DownloadFile($downloadUrl, $nugetPath)
 }
