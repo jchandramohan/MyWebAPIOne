@@ -14,8 +14,12 @@ if (!(Get-Command NuGet -ErrorAction SilentlyContinue) -and !(Test-Path $nugetPa
 	$credentialsB64S = [System.Convert]::ToBase64String($credentials)
 	$web.Headers[[System.Net.HttpRequestHeader]::Authorization] = "Basic" + $credentialsB64S
 	#>
-
-	$web.DownloadFile($downloadUrl, $nugetPath)
+	if ($web -ne $null)	{
+		$web.DownloadFile($downloadUrl, $nugetPath)
+	}
+	else {
+		Write-Host "Web client cannot be initialized."
+	}
 }
 else
 {
